@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_margin="16dp"
+              android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@drawable/rounded_corner"
+            android:gravity="center"
+            android:id="@+id/linearLayout2">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:padding="16dp"
+                android:text="Desc"
+                android:textColor="@color/black"
+                android:textSize="16sp" android:id="@+id/descText"
+                tools:layout_editor_absoluteX="0dp" app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/titleText" app:layout_constraintVertical_bias="0.0"/>
+        <Button
+                android:text="Annuler"
+                android:layout_width="106dp"
+                android:layout_height="39dp" android:id="@+id/messageButton"
+                android:background="@drawable/rounded_corner"
+                android:textColor="@android:color/white"
+                android:backgroundTintMode="src_over"
+                style="@style/Widget.MaterialComponents.Button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" app:layout_constraintHorizontal_bias="0.068"
+                app:layout_constraintVertical_bias="0.902"/>
+        <Button
+                android:text="Y aller"
+                android:layout_width="106dp"
+                android:layout_height="45dp" android:id="@+id/goBtn"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/messageButton"
+                app:layout_constraintVertical_bias="0.939" app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.868"/>
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:padding="16dp"
+                android:text="Titre"
+                android:textColor="@color/black"
+                android:textSize="16sp" android:id="@+id/titleText"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintVertical_bias="0.115"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

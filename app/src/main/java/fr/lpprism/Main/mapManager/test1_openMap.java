@@ -1,5 +1,9 @@
 package fr.lpprism.Main.mapManager;
 
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -14,6 +18,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
+import fr.lpprism.Main.PopUp;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -81,7 +86,7 @@ public class test1_openMap extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
 
 
         IMapController mapController = map.getController();
@@ -103,6 +108,11 @@ public class test1_openMap extends AppCompatActivity {
             startMarker2.setInfoWindow(new MarkerInfoWindow(R.layout.bonuspack_bubble_black, map));
             map.getOverlays().add(startMarker2);
             map.invalidate();
+
+            startMarker2.setOnMarkerClickListener((marker, mapView) -> {
+                PopUp.showPopupWindow(mapView, String.valueOf(startMarker2.getPosition()), "Type : Chiottes publiques");
+                return true;
+            });
 
         }
     }
@@ -136,6 +146,7 @@ public class test1_openMap extends AppCompatActivity {
                     REQUEST_PERMISSIONS_REQUEST_CODE);
         }
     }
+
 
 }
 
