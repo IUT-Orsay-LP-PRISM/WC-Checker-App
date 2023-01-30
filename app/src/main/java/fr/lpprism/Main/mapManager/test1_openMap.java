@@ -1,5 +1,6 @@
 package fr.lpprism.Main.mapManager;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,10 +31,16 @@ import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import java.util.ArrayList;
 
 import fr.lpprism.Main.R;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class test1_openMap extends AppCompatActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private MapView map = null;
+    private PLaceHolderAPI varPlaceHolderAPI;
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
@@ -53,15 +60,16 @@ public class test1_openMap extends AppCompatActivity {
         });
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Marker startMarker = new Marker(map);
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        startMarker.setInfoWindow(null);
+        startMarker.setIcon(ctx.getDrawable(R.drawable.currentpos) );
+
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 GeoPoint startPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                Marker startMarker = new Marker(map);
                 startMarker.setPosition(startPoint);
-                startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-                startMarker.setInfoWindow(null);
-                startMarker.setIcon(ctx.getDrawable(R.drawable.currentpos));
                 map.getOverlays().add(startMarker);
                 map.invalidate();
             }
@@ -97,9 +105,19 @@ public class test1_openMap extends AppCompatActivity {
 
         // how to place custom marker
         ArrayList<GeoPoint> points = new ArrayList<GeoPoint>();
-        points.add(new GeoPoint(49.8583, 2.2944));
-        points.add(new GeoPoint(50.8583, 2.2944));
-        points.add(new GeoPoint(51.8583, 3.2944));
+        // points.add(new GeoPoint(49.8583, 2.2944));
+        // points.add(new GeoPoint(50.8583, 2.2944));
+        // points.add(new GeoPoint(51.8583, 3.2944));
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://projets.iut-orsay.fr/prj-prism-rcastro/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        varPlaceHolderAPI = retrofit.create(PLaceHolderAPI.class);
+        get_post();
+
+        // https://projets.iut-orsay.fr/prj-prism-rcastro/wc-api-temp.php
 
         for (GeoPoint p : points) {
             Marker startMarker2 = new Marker(map);
@@ -145,6 +163,28 @@ public class test1_openMap extends AppCompatActivity {
                     permissionsToRequest.toArray(new String[0]),
                     REQUEST_PERMISSIONS_REQUEST_CODE);
         }
+    }
+
+    private void get_post(){
+        Call<PlaceHolderPost> call = varPlaceHolderAPI.getPosts();
+        call.enqueue(
+                new Callback<PlaceHolderPost>() {
+                    @Override
+                    public void onResponse(Call<PlaceHolderPost> call,
+                                           Response<PlaceHolderPost> response) {
+                        Log.d("UWU", response.isSuccessful() + "");
+
+                        if (response.isSuccessful()) {
+                            PlaceHolderPost p = response.body();
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<PlaceHolderPost> call,
+                                          Throwable t) {
+                        Log.d("UWU",t.getMessage());
+                    }
+                }
+        );
     }
 
 
