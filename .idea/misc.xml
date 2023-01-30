@@ -9,13 +9,15 @@
         <entry key="..\:/Users/louis/Documents/Dev/WCCheckerApp/app/src/main/res/layout/bonuspack_bubble_black.xml" value="0.1838768115942029" />
         <entry key="..\:/Users/louis/Documents/Dev/WCCheckerApp/app/src/main/res/layout/popup-rounded.xml" value="0.19047619047619047" />
         <entry key="..\:/Users/louis/Documents/Dev/WCCheckerApp/app/src/main/res/layout/popup.xml" value="0.67" />
+        <entry key="..\:/WC-Checker-App/app/src/main/res/font/fonts.xml" value="0.1" />
+        <entry key="..\:/WC-Checker-App/app/src/main/res/layout/activity_splashscreen.xml" value="0.2872887582659809" />
       </map>
     </option>
   </component>
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_17_PREVIEW" project-jdk-name="jbr-11" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
