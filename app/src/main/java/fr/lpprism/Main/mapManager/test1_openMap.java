@@ -183,7 +183,7 @@ public class test1_openMap extends AppCompatActivity {
                                 map.getOverlays().add(startMarker2);
                                 map.invalidate();
                                 startMarker2.setOnMarkerClickListener((marker, mapView) -> {
-                                    PopUp.showPopupWindow(mapView, String.valueOf(uneToilette.getAdresse()), "Type : " + uneToilette.getType());
+                                    PopUp.showPopupWindow(mapView, String.valueOf(uneToilette.getAdresse()), "Type : " + uneToilette.getType(), uneToilette.getSwitch());
                                     map.getController().animateTo(marker.getPosition());
                                     return true;
                                 });

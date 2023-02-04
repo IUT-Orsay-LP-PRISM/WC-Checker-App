@@ -104,7 +104,17 @@ public class PopUpFormAdd {
                             map.getOverlays().add(startMarker2);
                             map.invalidate();
                             startMarker2.setOnMarkerClickListener((marker, mapView) -> {
-                                PopUp.showPopupWindow(mapView, adresseValue, "Type : " + selectedType);
+                                String switchString = "";
+                                if (accesHandicapeValue == true) {
+                                    switchString += "Accès Mobilité Réduite\n";
+                                }
+                                if (accesRelaisBBValue == true) {
+                                    switchString += "Relais bébé\n";
+                                }
+                                if (accesGratuitValue == true) {
+                                    switchString += "Gratuit\n";
+                                }
+                                PopUp.showPopupWindow(mapView, adresseValue, "Type : " + selectedType, switchString);
                                 return true;
                             });
                         }

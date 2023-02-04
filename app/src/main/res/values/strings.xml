@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">WC-Checker-App</string>
+    <string name="Title_contient"><u>Contient</u></string>
 </resources>
