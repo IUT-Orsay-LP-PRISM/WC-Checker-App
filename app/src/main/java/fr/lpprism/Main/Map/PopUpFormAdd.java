@@ -1,26 +1,21 @@
-package fr.lpprism.Main;
+package fr.lpprism.Main.Map;
 
-import android.util.JsonReader;
+import android.content.Context;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import fr.lpprism.Main.Map.PopUpView;
 import fr.lpprism.Main.R;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 import fr.lpprism.Main.API.InterfaceAPI;
 import fr.lpprism.Main.API.EntityAPI;
@@ -68,19 +63,21 @@ public class PopUpFormAdd {
                         .build();
 
                 InterfaceAPI varPlaceHolderAPI = retrofit.create(InterfaceAPI.class);
-                pushToilettesToBDD(varPlaceHolderAPI, latitude, longitude, popupView, mapView);
+                pushToiletteToBDD(varPlaceHolderAPI, latitude, longitude, popupView, mapView);
                 popupWindow.dismiss();
             }
         });
     }
 
 
-    private static void pushToilettesToBDD(InterfaceAPI varPlaceHolderAPI, double latitude, double longitude, View popupView, MapView map) {
+    private static void pushToiletteToBDD(InterfaceAPI varPlaceHolderAPI, double latitude, double longitude, View popupView, MapView map) {
         // get popupView to get values
         EditText adresse = popupView.findViewById(R.id.inputTextAdresse);
         String adresseValue = adresse.getText().toString();
         Spinner spinner = popupView.findViewById(R.id.spinnerTypeToilettes);
         String selectedType = (String) spinner.getSelectedItem();
+        String typeValue = selectedType.equals("Privée") ? "Privee" : selectedType;
+
         Switch accesHandicape = popupView.findViewById(R.id.form_accessPMR);
         boolean accesHandicapeValue = accesHandicape.isChecked();
         Switch accesRelaisBB = popupView.findViewById(R.id.form_relaisBB);
@@ -88,18 +85,26 @@ public class PopUpFormAdd {
         Switch accesGratuit = popupView.findViewById(R.id.form_Free);
         boolean accesGratuitValue = accesGratuit.isChecked();
 
-        Call<EntityAPI> call = varPlaceHolderAPI.addToilette((float) longitude, (float) latitude, adresseValue, selectedType, "test", accesHandicapeValue, accesRelaisBBValue, accesGratuitValue);
+        Call<EntityAPI> call = varPlaceHolderAPI.addToilette((float) longitude, (float) latitude, adresseValue, typeValue, "non indique", accesHandicapeValue, accesRelaisBBValue, accesGratuitValue);
         call.enqueue(
                 new Callback<EntityAPI>() {
                     @Override
                     public void onResponse(Call<EntityAPI> call,
                                            Response<EntityAPI> response) {
                         if (response.isSuccessful()) {
-                            EntityAPI posts = response.body();
+                            Log.d("UwU", "GOOD");
+                            Context ctx = map.getContext();
                             GeoPoint point = new GeoPoint(latitude, longitude);
                             Marker startMarker2 = new Marker(map);
                             startMarker2.setPosition(point);
                             startMarker2.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                            if (typeValue.equals("Publique"))
+                                startMarker2.setIcon(ctx.getDrawable(R.drawable.marker_public));
+                            else if(typeValue.equals("Privee")){
+                                startMarker2.setIcon(ctx.getDrawable(R.drawable.marker_private));
+                            } else {
+                                startMarker2.setIcon(ctx.getDrawable(R.drawable.marker_other));
+                            }
                             map.getOverlays().add(startMarker2);
                             map.invalidate();
                             startMarker2.setOnMarkerClickListener((marker, mapView) -> {
