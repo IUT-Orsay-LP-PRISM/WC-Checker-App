@@ -1,11 +1,12 @@
-package fr.lpprism.Main;
+package fr.lpprism.Main.Map;
 
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
+import fr.lpprism.Main.R;
 
-public class PopUp {
+public class PopUpView {
 
     public static void showPopupWindow(final View view, String title, String description) {
         LayoutInflater inflater = (LayoutInflater) view.getContext().getSystemService(view.getContext().LAYOUT_INFLATER_SERVICE);
@@ -27,7 +28,7 @@ public class PopUp {
         buttonEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(view.getContext(), "Wow, popup action button", Toast.LENGTH_SHORT).show();
+                popupWindow.dismiss();
             }
         });
         Button buttonGo = popupView.findViewById(R.id.goBtn);

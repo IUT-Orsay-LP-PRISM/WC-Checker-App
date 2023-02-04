@@ -1,9 +1,7 @@
-package fr.lpprism.Main.mapManager;
+package fr.lpprism.Main.Map;
 
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.*;
+import android.util.Log;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -18,22 +16,32 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
-import fr.lpprism.Main.PopUp;
+import fr.lpprism.Main.API.InterfaceAPI;
+import fr.lpprism.Main.API.EntityAPI;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 import java.util.ArrayList;
 
 import fr.lpprism.Main.R;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-public class test1_openMap extends AppCompatActivity {
+public class OpenMap extends AppCompatActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private MapView map = null;
+    private InterfaceAPI varPlaceHolderAPI;
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
@@ -41,7 +49,7 @@ public class test1_openMap extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
-        setContentView(R.layout.activity_test1_open_map);
+        setContentView(R.layout.open_map);
         map = findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
@@ -53,15 +61,16 @@ public class test1_openMap extends AppCompatActivity {
         });
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Marker startMarker = new Marker(map);
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+        startMarker.setInfoWindow(null);
+        startMarker.setIcon(ctx.getDrawable(R.drawable.currentpos));
+
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 GeoPoint startPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                Marker startMarker = new Marker(map);
                 startMarker.setPosition(startPoint);
-                startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-                startMarker.setInfoWindow(null);
-                startMarker.setIcon(ctx.getDrawable(R.drawable.currentpos));
                 map.getOverlays().add(startMarker);
                 map.invalidate();
             }
@@ -94,27 +103,33 @@ public class test1_openMap extends AppCompatActivity {
         GeoPoint startPoint = new GeoPoint(48.8583, 2.2944);
         mapController.setCenter(startPoint);
 
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://projets.iut-orsay.fr/prj-prism-rcastro/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        varPlaceHolderAPI = retrofit.create(InterfaceAPI.class);
 
         // how to place custom marker
-        ArrayList<GeoPoint> points = new ArrayList<GeoPoint>();
-        points.add(new GeoPoint(49.8583, 2.2944));
-        points.add(new GeoPoint(50.8583, 2.2944));
-        points.add(new GeoPoint(51.8583, 3.2944));
+        placeMarkerAllToilettes();
 
-        for (GeoPoint p : points) {
-            Marker startMarker2 = new Marker(map);
-            startMarker2.setPosition(p);
-            startMarker2.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            startMarker2.setInfoWindow(new MarkerInfoWindow(R.layout.bonuspack_bubble_black, map));
-            map.getOverlays().add(startMarker2);
-            map.invalidate();
 
-            startMarker2.setOnMarkerClickListener((marker, mapView) -> {
-                PopUp.showPopupWindow(mapView, String.valueOf(startMarker2.getPosition()), "Type : Chiottes publiques");
-                return true;
-            });
+        MapEventsReceiver mReceive = new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                return false;
+            }
 
-        }
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                PopUpFormAdd.showPopupWindow(map, p.getLatitude(), p.getLongitude());
+                return false;
+            }
+        };
+
+        map.getOverlays().add(new MapEventsOverlay(mReceive));
+        //Refreshing the map to draw the new overlay
+        map.invalidate();
     }
 
     @Override
@@ -147,6 +162,39 @@ public class test1_openMap extends AppCompatActivity {
         }
     }
 
+    private void placeMarkerAllToilettes() {
+        Call<EntityAPI[]> call = varPlaceHolderAPI.getAllToilettes();
+        call.enqueue(
+                new Callback<EntityAPI[]>() {
+                    @Override
+                    public void onResponse(Call<EntityAPI[]> call,
+                                           Response<EntityAPI[]> response) {
+                        if (response.isSuccessful()) {
+                            EntityAPI[] posts = response.body();
+                            for (EntityAPI uneToilette : posts) {
+                                Log.d("UWU", String.valueOf(uneToilette.getLatitude() + " " + uneToilette.getLongitude()));
 
+                                GeoPoint point = new GeoPoint(Double.parseDouble(uneToilette.getLatitude()), Double.parseDouble(uneToilette.getLongitude()));
+                                Marker startMarker2 = new Marker(map);
+                                startMarker2.setPosition(point);
+                                startMarker2.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                                map.getOverlays().add(startMarker2);
+                                map.invalidate();
+                                startMarker2.setOnMarkerClickListener((marker, mapView) -> {
+                                    PopUpView.showPopupWindow(mapView, String.valueOf(uneToilette.getAdresse()), "Type : " + uneToilette.getType());
+                                    return true;
+                                });
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<EntityAPI[]> call,
+                                          Throwable t) {
+                        Log.d("UWU", t.getMessage());
+                    }
+                }
+        );
+    }
 }
 
