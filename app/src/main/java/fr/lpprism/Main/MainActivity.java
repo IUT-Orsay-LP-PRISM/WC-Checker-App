@@ -16,13 +16,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                final Intent mainIntent = new Intent(MainActivity.this, OpenMap.class);
-                startActivity(mainIntent);
-                finish();
-            }
+        new Handler().postDelayed(() -> {
+            final Intent mainIntent = new Intent(MainActivity.this, OpenMap.class);
+            startActivity(mainIntent);
+            finish();
         }, 4000);
 
     }
