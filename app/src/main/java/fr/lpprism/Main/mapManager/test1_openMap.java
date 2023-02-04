@@ -1,10 +1,6 @@
 package fr.lpprism.Main.mapManager;
 
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -24,14 +20,17 @@ import fr.lpprism.Main.PopUp;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 import java.util.ArrayList;
 
+import fr.lpprism.Main.PopUpFormAdd;
 import fr.lpprism.Main.R;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -113,6 +112,24 @@ public class test1_openMap extends AppCompatActivity {
 
         // how to place custom marker
         placeMarkerAllToilettes();
+
+
+        MapEventsReceiver mReceive = new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                return false;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                PopUpFormAdd.showPopupWindow(map, p.getLatitude(), p.getLongitude());
+                return false;
+            }
+        };
+
+        map.getOverlays().add(new MapEventsOverlay(mReceive));
+        //Refreshing the map to draw the new overlay
+        map.invalidate();
     }
 
     @Override

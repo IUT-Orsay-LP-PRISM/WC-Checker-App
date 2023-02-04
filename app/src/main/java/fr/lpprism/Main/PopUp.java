@@ -27,7 +27,7 @@ public class PopUp {
         buttonEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(view.getContext(), "Wow, popup action button", Toast.LENGTH_SHORT).show();
+                popupWindow.dismiss();
             }
         });
         Button buttonGo = popupView.findViewById(R.id.goBtn);

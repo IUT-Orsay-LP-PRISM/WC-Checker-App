@@ -14,6 +14,7 @@ public class PlaceHolderPost {
     private String horaires;
     private String acces_pmr;
     private String relais_bebe;
+    private String free;
 
     public String getLongitude() {
         return this.coordinatesX;
