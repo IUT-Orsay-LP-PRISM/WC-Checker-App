@@ -1,7 +1,9 @@
 package fr.lpprism.Main.Map;
 
+import android.app.WallpaperManager;
 import android.util.Log;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -50,6 +52,9 @@ public class OpenMap extends AppCompatActivity {
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         setContentView(R.layout.open_map);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.action_bar);
         map = findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
@@ -173,11 +178,19 @@ public class OpenMap extends AppCompatActivity {
                             EntityAPI[] posts = response.body();
                             for (EntityAPI uneToilette : posts) {
                                 Log.d("UWU", String.valueOf(uneToilette.getLatitude() + " " + uneToilette.getLongitude()));
+                                Context ctx = getApplicationContext();
 
                                 GeoPoint point = new GeoPoint(Double.parseDouble(uneToilette.getLatitude()), Double.parseDouble(uneToilette.getLongitude()));
                                 Marker startMarker2 = new Marker(map);
                                 startMarker2.setPosition(point);
                                 startMarker2.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                                if (uneToilette.getType().equals("Publique"))
+                                    startMarker2.setIcon(ctx.getDrawable(R.drawable.marker_public));
+                                else if(uneToilette.getType().equals("Privée")){
+                                    startMarker2.setIcon(ctx.getDrawable(R.drawable.marker_private));
+                                } else {
+                                    startMarker2.setIcon(ctx.getDrawable(R.drawable.marker_other));
+                                }
                                 map.getOverlays().add(startMarker2);
                                 map.invalidate();
                                 startMarker2.setOnMarkerClickListener((marker, mapView) -> {
