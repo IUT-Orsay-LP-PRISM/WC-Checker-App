@@ -1,4 +1,4 @@
-package fr.lpprism.Main.mapManager;
+package fr.lpprism.Main.Map;
 
 import android.util.Log;
 
@@ -16,8 +16,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
-import fr.lpprism.Main.PopUp;
-
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
@@ -26,10 +24,11 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 import java.util.ArrayList;
 
+import fr.lpprism.Main.API.EntityAPI;
+import fr.lpprism.Main.API.InterfaceAPI;
 import fr.lpprism.Main.PopUpFormAdd;
 import fr.lpprism.Main.R;
 import retrofit2.Call;
@@ -47,13 +46,15 @@ public class OpenMap extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
-        setContentView(R.layout.activity_test1_open_map);
+        setContentView(R.layout.open_map);
         map = findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
         map.setMinZoomLevel(3.0);
+        map.getZoomController().setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER);
 
         requestPermissionsIfNecessary(new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -108,7 +109,7 @@ public class OpenMap extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        varPlaceHolderAPI = retrofit.create(PLaceHolderAPI.class);
+        varPlaceHolderAPI = retrofit.create(InterfaceAPI.class);
 
         // how to place custom marker
         placeMarkerAllToilettes();
@@ -163,22 +164,21 @@ public class OpenMap extends AppCompatActivity {
     }
 
     private void placeMarkerAllToilettes() {
-        Call<PlaceHolderPost[]> call = varPlaceHolderAPI.getAllToilettes();
+        Call<EntityAPI[]> call = varPlaceHolderAPI.getAllToilettes();
         call.enqueue(
-                new Callback<PlaceHolderPost[]>() {
+                new Callback<EntityAPI[]>() {
                     @Override
-                    public void onResponse(Call<PlaceHolderPost[]> call,
-                                           Response<PlaceHolderPost[]> response) {
+                    public void onResponse(Call<EntityAPI[]> call,
+                                           Response<EntityAPI[]> response) {
                         if (response.isSuccessful()) {
-                            PlaceHolderPost[] posts = response.body();
-                            for (PlaceHolderPost uneToilette : posts) {
+                            EntityAPI[] posts = response.body();
+                            for (EntityAPI uneToilette : posts) {
                                 Log.d("UWU", String.valueOf(uneToilette.getLatitude() + " " + uneToilette.getLongitude()));
 
                                 GeoPoint point = new GeoPoint(Double.parseDouble(uneToilette.getLatitude()), Double.parseDouble(uneToilette.getLongitude()));
                                 Marker startMarker2 = new Marker(map);
                                 startMarker2.setPosition(point);
                                 startMarker2.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                                startMarker2.setInfoWindow(new MarkerInfoWindow(R.layout.bonuspack_bubble_black, map));
                                 map.getOverlays().add(startMarker2);
                                 map.invalidate();
                                 startMarker2.setOnMarkerClickListener((marker, mapView) -> {
@@ -191,7 +191,7 @@ public class OpenMap extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<PlaceHolderPost[]> call,
+                    public void onFailure(Call<EntityAPI[]> call,
                                           Throwable t) {
                         Log.d("UWU", t.getMessage());
                     }

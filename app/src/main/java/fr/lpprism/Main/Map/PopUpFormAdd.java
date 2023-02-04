@@ -15,6 +15,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import fr.lpprism.Main.Map.PopUpView;
 import fr.lpprism.Main.R;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -99,7 +100,6 @@ public class PopUpFormAdd {
                             Marker startMarker2 = new Marker(map);
                             startMarker2.setPosition(point);
                             startMarker2.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                            startMarker2.setInfoWindow(new MarkerInfoWindow(R.layout.bonuspack_bubble_black, map));
                             map.getOverlays().add(startMarker2);
                             map.invalidate();
                             startMarker2.setOnMarkerClickListener((marker, mapView) -> {
@@ -113,7 +113,7 @@ public class PopUpFormAdd {
                                 if (accesGratuitValue == true) {
                                     switchString += "Gratuit\n";
                                 }
-                                PopUp.showPopupWindow(mapView, adresseValue, "Type : " + selectedType, switchString);
+                                PopUpView.showPopupWindow(mapView, adresseValue, "Type : " + selectedType, switchString);
                                 return true;
                             });
                         }
