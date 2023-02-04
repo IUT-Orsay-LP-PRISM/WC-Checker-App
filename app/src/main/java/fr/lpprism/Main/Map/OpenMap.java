@@ -1,9 +1,7 @@
 package fr.lpprism.Main.Map;
 
-import android.app.WallpaperManager;
 import android.util.Log;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -18,9 +16,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
-import fr.lpprism.Main.API.InterfaceAPI;
-import fr.lpprism.Main.API.EntityAPI;
-
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
@@ -29,10 +24,12 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 import java.util.ArrayList;
 
+import fr.lpprism.Main.API.EntityAPI;
+import fr.lpprism.Main.API.InterfaceAPI;
+import fr.lpprism.Main.PopUpFormAdd;
 import fr.lpprism.Main.R;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -49,16 +46,15 @@ public class OpenMap extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         setContentView(R.layout.open_map);
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setCustomView(R.layout.action_bar);
         map = findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
         map.setMinZoomLevel(3.0);
+        map.getZoomController().setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER);
 
         requestPermissionsIfNecessary(new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -178,23 +174,16 @@ public class OpenMap extends AppCompatActivity {
                             EntityAPI[] posts = response.body();
                             for (EntityAPI uneToilette : posts) {
                                 Log.d("UWU", String.valueOf(uneToilette.getLatitude() + " " + uneToilette.getLongitude()));
-                                Context ctx = getApplicationContext();
 
                                 GeoPoint point = new GeoPoint(Double.parseDouble(uneToilette.getLatitude()), Double.parseDouble(uneToilette.getLongitude()));
                                 Marker startMarker2 = new Marker(map);
                                 startMarker2.setPosition(point);
                                 startMarker2.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                                if (uneToilette.getType().equals("Publique"))
-                                    startMarker2.setIcon(ctx.getDrawable(R.drawable.marker_public));
-                                else if(uneToilette.getType().equals("Privée")){
-                                    startMarker2.setIcon(ctx.getDrawable(R.drawable.marker_private));
-                                } else {
-                                    startMarker2.setIcon(ctx.getDrawable(R.drawable.marker_other));
-                                }
                                 map.getOverlays().add(startMarker2);
                                 map.invalidate();
                                 startMarker2.setOnMarkerClickListener((marker, mapView) -> {
-                                    PopUpView.showPopupWindow(mapView, String.valueOf(uneToilette.getAdresse()), "Type : " + uneToilette.getType());
+                                    PopUpView.showPopupWindow(mapView, String.valueOf(uneToilette.getAdresse()), "Type : " + uneToilette.getType(), uneToilette.getSwitch());
+                                    map.getController().animateTo(marker.getPosition());
                                     return true;
                                 });
                             }

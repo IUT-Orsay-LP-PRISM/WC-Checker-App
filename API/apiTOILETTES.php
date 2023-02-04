@@ -1,10 +1,11 @@
-
 <?php
+header("Content-Type: application/json; charset=UTF-8");
+
 $servername = "localhost";
 $username = "prj-prism-rcastro";
 $password = "IXkOmlUeiR8923oa";
 $dbname = "prj-prism-rcastro";
-header('Content-Type: application/json');
+
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -74,10 +75,11 @@ $adresse = addslashes($adresse);
   $sql = "INSERT INTO WC(datasetid, coordinatesX, coordinatesY, adresse, type, horaires, acces_pmr, relais_bebe, free) VALUES ('ajoutUtilisateur', $coordinatesX, $coordinatesY, '$adresse', '$type', '$horaires', $acces_pmr, $relais_bebe, $free)";
 
   if ($conn->query($sql) === TRUE) {
-    echo "Success";
-  } else {
-      echo "Error: " . $sql . "<br>" . $conn->error;
-    }
-  $conn->close();
+    //echo json_encode(["code" => 200, "body" => "Ajout d'une toilette réussi"]);
+	echo json_encode(["code" => 200]);
+    } else {
+    echo json_encode(array("message" => "Echec de l'ajout du toilette. Error: " . $conn->error));
+}
+$conn->close();
 }
 ?> 

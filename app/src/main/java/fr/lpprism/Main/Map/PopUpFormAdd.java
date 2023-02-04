@@ -1,20 +1,26 @@
-package fr.lpprism.Main.Map;
+package fr.lpprism.Main;
 
+import android.util.JsonReader;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import fr.lpprism.Main.Map.PopUpView;
 import fr.lpprism.Main.R;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 import fr.lpprism.Main.API.InterfaceAPI;
 import fr.lpprism.Main.API.EntityAPI;
@@ -62,22 +68,14 @@ public class PopUpFormAdd {
                         .build();
 
                 InterfaceAPI varPlaceHolderAPI = retrofit.create(InterfaceAPI.class);
-                pushToilettesToBDD(varPlaceHolderAPI, latitude, longitude, popupView);
-
-
-                GeoPoint point = new GeoPoint(latitude, longitude);
-                Marker startMarker2 = new Marker(mapView);
-                startMarker2.setPosition(point);
-                startMarker2.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                mapView.getOverlays().add(startMarker2);
-                mapView.invalidate();
+                pushToilettesToBDD(varPlaceHolderAPI, latitude, longitude, popupView, mapView);
                 popupWindow.dismiss();
             }
         });
     }
 
 
-    private static void pushToilettesToBDD(InterfaceAPI varPlaceHolderAPI, double latitude, double longitude, View popupView) {
+    private static void pushToilettesToBDD(InterfaceAPI varPlaceHolderAPI, double latitude, double longitude, View popupView, MapView map) {
         // get popupView to get values
         EditText adresse = popupView.findViewById(R.id.inputTextAdresse);
         String adresseValue = adresse.getText().toString();
@@ -98,7 +96,26 @@ public class PopUpFormAdd {
                                            Response<EntityAPI> response) {
                         if (response.isSuccessful()) {
                             EntityAPI posts = response.body();
-                            Log.d("UWU", posts.toString());
+                            GeoPoint point = new GeoPoint(latitude, longitude);
+                            Marker startMarker2 = new Marker(map);
+                            startMarker2.setPosition(point);
+                            startMarker2.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                            map.getOverlays().add(startMarker2);
+                            map.invalidate();
+                            startMarker2.setOnMarkerClickListener((marker, mapView) -> {
+                                String switchString = "";
+                                if (accesHandicapeValue == true) {
+                                    switchString += "Accès Mobilité Réduite\n";
+                                }
+                                if (accesRelaisBBValue == true) {
+                                    switchString += "Relais bébé\n";
+                                }
+                                if (accesGratuitValue == true) {
+                                    switchString += "Gratuit\n";
+                                }
+                                PopUpView.showPopupWindow(mapView, adresseValue, "Type : " + selectedType, switchString);
+                                return true;
+                            });
                         }
                     }
 
