@@ -47,6 +47,7 @@ public class test1_openMap extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         setContentView(R.layout.activity_test1_open_map);
@@ -54,6 +55,7 @@ public class test1_openMap extends AppCompatActivity {
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
         map.setMinZoomLevel(3.0);
+        map.getZoomController().setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER);
 
         requestPermissionsIfNecessary(new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -128,7 +130,6 @@ public class test1_openMap extends AppCompatActivity {
         };
 
         map.getOverlays().add(new MapEventsOverlay(mReceive));
-        //Refreshing the map to draw the new overlay
         map.invalidate();
     }
 
@@ -183,6 +184,7 @@ public class test1_openMap extends AppCompatActivity {
                                 map.invalidate();
                                 startMarker2.setOnMarkerClickListener((marker, mapView) -> {
                                     PopUp.showPopupWindow(mapView, String.valueOf(uneToilette.getAdresse()), "Type : " + uneToilette.getType());
+                                    map.getController().animateTo(marker.getPosition());
                                     return true;
                                 });
                             }

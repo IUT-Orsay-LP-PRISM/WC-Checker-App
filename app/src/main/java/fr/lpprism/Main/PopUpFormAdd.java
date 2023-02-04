@@ -68,22 +68,14 @@ public class PopUpFormAdd {
                         .build();
 
                 PLaceHolderAPI varPlaceHolderAPI = retrofit.create(PLaceHolderAPI.class);
-                pushToilettesToBDD(varPlaceHolderAPI, latitude, longitude, popupView);
-
-
-                GeoPoint point = new GeoPoint(latitude, longitude);
-                Marker startMarker2 = new Marker(mapView);
-                startMarker2.setPosition(point);
-                startMarker2.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                mapView.getOverlays().add(startMarker2);
-                mapView.invalidate();
+                pushToilettesToBDD(varPlaceHolderAPI, latitude, longitude, popupView, mapView);
                 popupWindow.dismiss();
             }
         });
     }
 
 
-    private static void pushToilettesToBDD(PLaceHolderAPI varPlaceHolderAPI, double latitude, double longitude, View popupView) {
+    private static void pushToilettesToBDD(PLaceHolderAPI varPlaceHolderAPI, double latitude, double longitude, View popupView, MapView map) {
         // get popupView to get values
         EditText adresse = popupView.findViewById(R.id.inputTextAdresse);
         String adresseValue = adresse.getText().toString();
@@ -104,7 +96,17 @@ public class PopUpFormAdd {
                                            Response<PlaceHolderPost> response) {
                         if (response.isSuccessful()) {
                             PlaceHolderPost posts = response.body();
-                            Log.d("UWU", posts.toString());
+                            GeoPoint point = new GeoPoint(latitude, longitude);
+                            Marker startMarker2 = new Marker(map);
+                            startMarker2.setPosition(point);
+                            startMarker2.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                            startMarker2.setInfoWindow(new MarkerInfoWindow(R.layout.bonuspack_bubble_black, map));
+                            map.getOverlays().add(startMarker2);
+                            map.invalidate();
+                            startMarker2.setOnMarkerClickListener((marker, mapView) -> {
+                                PopUp.showPopupWindow(mapView, adresseValue, "Type : " + selectedType);
+                                return true;
+                            });
                         }
                     }
 
