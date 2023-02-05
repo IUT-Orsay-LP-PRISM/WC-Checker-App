@@ -27,7 +27,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PopUpFormAdd {
 
-    public static void showPopupWindow(final MapView mapView, double latitude, double longitude) {
+    public static void showPopupWindow(final MapView mapView, double latitude, double longitude, String adresse) {
         LayoutInflater inflater = (LayoutInflater) mapView.getContext().getSystemService(mapView.getContext().LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.popup_form_add, null);
         int width = 1000;
@@ -37,6 +37,8 @@ public class PopUpFormAdd {
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
         popupWindow.showAtLocation(mapView, Gravity.BOTTOM, 0, 200);
 
+        EditText adresseInput = popupView.findViewById(R.id.inputTextAdresse);
+        adresseInput.setText(adresse);
 
         String[] list = {"Publique", "Privée", "Restaurant", "Commerce"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(mapView.getContext(), android.R.layout.simple_spinner_item, list);
