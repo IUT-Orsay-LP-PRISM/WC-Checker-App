@@ -1,5 +1,8 @@
 package fr.lpprism.Main.Map;
 
+import static fr.lpprism.Main.Map.OpenMap.GetDistance;
+import static fr.lpprism.Main.Map.OpenMap.currentPos;
+
 import android.content.Context;
 import android.util.Log;
 import android.view.Gravity;
@@ -16,6 +19,8 @@ import fr.lpprism.Main.R;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+
+import java.util.ArrayList;
 
 import fr.lpprism.Main.API.InterfaceAPI;
 import fr.lpprism.Main.API.EntityAPI;
@@ -110,17 +115,15 @@ public class PopUpFormAdd {
                             map.getOverlays().add(startMarker2);
                             map.invalidate();
                             startMarker2.setOnMarkerClickListener((marker, mapView) -> {
-                                String switchString = "";
-                                if (accesHandicapeValue == true) {
-                                    switchString += "Accès Mobilité Réduite\n";
-                                }
-                                if (accesRelaisBBValue == true) {
-                                    switchString += "Relais bébé\n";
-                                }
-                                if (accesGratuitValue == true) {
-                                    switchString += "Gratuit\n";
-                                }
-                                PopUpView.showPopupWindow(mapView, adresseValue, "Type : " + selectedType, switchString);
+
+                                ArrayList<Boolean> switchList = new ArrayList<Boolean>();
+                                switchList.add(accesHandicapeValue == true);
+                                switchList.add(accesGratuitValue == true);
+                                switchList.add(accesRelaisBBValue == true);
+
+                                String distanceString = GetDistance(currentPos.getLatitude(), currentPos.getLongitude(), latitude, longitude);
+                                PopUpView.showPopupWindow(mapView, adresseValue, selectedType, switchList, distanceString);
+
                                 return true;
                             });
                         }

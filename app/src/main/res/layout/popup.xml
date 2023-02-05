@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_margin="16dp"
-              android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp"
+    android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:background="@drawable/rounded_corner"
-            android:gravity="center"
-            android:id="@+id/linearLayout2">
+        android:id="@+id/linearLayout2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@drawable/rounded_corner"
+        android:gravity="center">
 
         <Button
             android:id="@+id/messageButton"
@@ -40,57 +40,96 @@
             android:id="@+id/txtV_adress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="16dp"
             android:gravity="center_horizontal"
-            android:padding="16dp"
+            android:padding="0dp"
             android:text="Adresse"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/id_distance" />
+
+        <TextView
+            android:id="@+id/id_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:text="Toilette à proximité"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/id_badge_type" />
+
+        <TextView
+            android:id="@+id/id_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:text="À 650M"
+            android:textColor="#000000"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/id_title" />
+
+        <TextView
+            android:id="@+id/id_badge_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/back"
+            android:padding="5dp"
+            android:text="Privée"
+            android:textColor="#000000"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/txtV_switch"
-            android:layout_width="match_parent"
+            android:id="@+id/id_badges_AMR"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:padding="16dp"
-            android:text="switch"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-        <TextView
-            android:id="@+id/txtV_type"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center_horizontal"
-            android:padding="0dp"
-            android:text="type"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/back_red"
+            android:padding="5dp"
+            android:text="Accès Mobilité Réduite"
+            android:textColor="#F30707"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txtV_adress" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/id_badges_BEBE"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/Title_contient"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/back_red"
+            android:padding="5dp"
+            android:text="Relais Bébé"
+            android:textColor="#F30707"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtV_type" />
+            app:layout_constraintTop_toBottomOf="@+id/id_badges_AMR" />
+
+        <TextView
+            android:id="@+id/id_badges_FREE"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/back_red"
+            android:padding="5dp"
+            android:text="Gratuit"
+            android:textColor="#F30707"
+            app:layout_constraintStart_toEndOf="@+id/id_badges_AMR"
+            app:layout_constraintTop_toBottomOf="@+id/txtV_adress" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>
