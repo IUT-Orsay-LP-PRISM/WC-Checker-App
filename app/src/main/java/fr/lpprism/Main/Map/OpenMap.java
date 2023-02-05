@@ -30,6 +30,7 @@ import java.util.ArrayList;
 
 import fr.lpprism.Main.API.EntityAPI;
 import fr.lpprism.Main.API.InterfaceAPI;
+import fr.lpprism.Main.API.reverseAPI;
 import fr.lpprism.Main.R;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -126,7 +127,29 @@ public class OpenMap extends AppCompatActivity {
 
             @Override
             public boolean longPressHelper(GeoPoint p) {
-                PopUpFormAdd.showPopupWindow(map, p.getLatitude(), p.getLongitude());
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("https://nominatim.openstreetmap.org/")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+                varPlaceHolderAPI = retrofit.create(InterfaceAPI.class);
+                Call<reverseAPI> call = varPlaceHolderAPI.reverse("jsonv2",(float) p.getLatitude(), (float) p.getLongitude());
+                call.enqueue(
+                        new Callback<reverseAPI>() {
+                            @Override
+                            public void onResponse(Call<reverseAPI> call,
+                                                   Response<reverseAPI> response) {
+                                if (response.isSuccessful()) {
+                                    String address = response.body().getAdresse();
+                                    PopUpFormAdd.showPopupWindow(map, p.getLatitude(), p.getLongitude(), address);
+                                }
+                            }
+                            @Override
+                            public void onFailure(Call<reverseAPI> call,
+                                                  Throwable t) {
+                                Log.d("UWU", t.getMessage());
+                            }
+                        }
+                );
                 return false;
             }
         };
@@ -183,7 +206,7 @@ public class OpenMap extends AppCompatActivity {
                                 startMarker2.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                                 if (uneToilette.getType().equals("Publique"))
                                     startMarker2.setIcon(ctx.getDrawable(R.drawable.marker_public));
-                                else if(uneToilette.getType().equals("Privee")){
+                                else if (uneToilette.getType().equals("Privee")) {
                                     startMarker2.setIcon(ctx.getDrawable(R.drawable.marker_private));
                                 } else {
                                     startMarker2.setIcon(ctx.getDrawable(R.drawable.marker_other));
