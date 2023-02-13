@@ -16,6 +16,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -39,9 +40,11 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class OpenMap extends AppCompatActivity {
+    private static final double EARTH_RADIUS = 6371;
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private MapView map = null;
     private InterfaceAPI varPlaceHolderAPI;
+    static GeoPoint currentPos;
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
@@ -60,6 +63,11 @@ public class OpenMap extends AppCompatActivity {
         map.setMinZoomLevel(3.0);
         map.getZoomController().setVisibility(org.osmdroid.views.CustomZoomButtonsController.Visibility.NEVER);
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
         requestPermissionsIfNecessary(new String[]{
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -71,11 +79,26 @@ public class OpenMap extends AppCompatActivity {
         startMarker.setInfoWindow(null);
         startMarker.setIcon(ctx.getDrawable(R.drawable.currentpos));
 
+
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (location != null) {
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+            // Do something with the location data
+            GeoPoint startPoint = new GeoPoint(latitude, longitude);
+            currentPos = startPoint;
+            startMarker.setPosition(currentPos);
+            map.getOverlays().add(startMarker);
+            map.invalidate();
+        }
+
+
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                GeoPoint startPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                startMarker.setPosition(startPoint);
+                Log.d("UWU", "onLocationChanged: " + location.getLatitude() + " " + location.getLongitude());
+                currentPos = new GeoPoint(location.getLatitude(), location.getLongitude());
+                startMarker.setPosition(currentPos);
                 map.getOverlays().add(startMarker);
                 map.invalidate();
             }
@@ -97,11 +120,7 @@ public class OpenMap extends AppCompatActivity {
         };
 
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
-
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
         IMapController mapController = map.getController();
         mapController.setZoom(9.5);
@@ -132,7 +151,7 @@ public class OpenMap extends AppCompatActivity {
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
                 varPlaceHolderAPI = retrofit.create(InterfaceAPI.class);
-                Call<reverseAPI> call = varPlaceHolderAPI.reverse("jsonv2",(float) p.getLatitude(), (float) p.getLongitude());
+                Call<reverseAPI> call = varPlaceHolderAPI.reverse("jsonv2", (float) p.getLatitude(), (float) p.getLongitude());
                 call.enqueue(
                         new Callback<reverseAPI>() {
                             @Override
@@ -143,6 +162,7 @@ public class OpenMap extends AppCompatActivity {
                                     PopUpFormAdd.showPopupWindow(map, p.getLatitude(), p.getLongitude(), address);
                                 }
                             }
+
                             @Override
                             public void onFailure(Call<reverseAPI> call,
                                                   Throwable t) {
@@ -215,8 +235,14 @@ public class OpenMap extends AppCompatActivity {
                                 map.invalidate();
                                 startMarker2.setOnMarkerClickListener((marker, mapView) -> {
                                     String Type = uneToilette.getType().equals("Privee") ? "Privée" : uneToilette.getType();
-                                    PopUpView.showPopupWindow(mapView, String.valueOf(uneToilette.getAdresse()), "Type : " + Type, uneToilette.getSwitch());
+
+                                    String distanceString = GetDistance(currentPos.getLatitude(), currentPos.getLongitude(), Double.parseDouble(uneToilette.getLatitude()), Double.parseDouble(uneToilette.getLongitude()));
+
+                                    PopUpView.showPopupWindow(mapView, String.valueOf(uneToilette.getAdresse()), Type, uneToilette.getSwitch(),distanceString);
                                     map.getController().animateTo(marker.getPosition());
+
+
+
                                     return true;
                                 });
                             }
@@ -231,5 +257,42 @@ public class OpenMap extends AppCompatActivity {
                 }
         );
     }
+
+
+    public static String GetDistance(double lat1, double lon1, double lat2, double lon2) {
+        double distance = haversineDistance(lat1, lon1, lat2, lon2);
+        // round distance
+        distance = Math.round(distance * 100.0) / 100.0;
+
+        String distanceString = String.valueOf(distance);
+
+        if (distance < 1) {
+            // convertir en mètre
+            distance *= 1000;
+            distanceString = String.valueOf(distance);
+            distanceString = distanceString.substring(0, distanceString.indexOf("."));
+            distanceString += " M";
+        } else {
+            distanceString = distanceString.substring(0, distanceString.indexOf("."));
+            distanceString += " KM";
+        }
+        return "À "+distanceString;
+    }
+
+    public static double haversineDistance(double lat1, double lon1, double lat2, double lon2) {
+        double phi1 = Math.toRadians(lat1);
+        double phi2 = Math.toRadians(lat2);
+        double deltaPhi = Math.toRadians(lat2 - lat1);
+        double deltaLambda = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+                Math.cos(phi1) * Math.cos(phi2) *
+                        Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = EARTH_RADIUS * c;
+
+        return distance;
+    }
+
 }
 
