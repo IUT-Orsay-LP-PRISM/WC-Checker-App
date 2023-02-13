@@ -1,0 +1,18 @@
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+
+# R�cup�rer tout les toilettes :
+RewriteRule ^getAllToilettes$ apiTOILETTES.php?action=getAllToilettes [L]
+
+#R�cup�rer un toilette via son id :
+RewriteRule ^getToiletteById-([0-9]+) apiTOILETTES.php?action=getToiletteById&id=$1 [L]
+
+# Ajouter un toilette par un utilisateur :
+RewriteRule ^addToilette/([-+]?[0-9]*\.?[0-9]+)/([-+]?[0-9]*\.?[0-9]+)/(.*?)/([a-zA-Z0-9]+)/([a-zA-Z0-9\s]+)/(true|false)/(true|false)/(true|false)$ apiTOILETTES.php?action=addToilette&coordinatesX=$1&coordinatesY=$2&adresse=$3&type=$4&horaires=$5&acces_pmr=$6&relais_bebe=$7&free=$8 [NC,L]
+
+# Add headers to allow CORS
+Header add Access-Control-Allow-Origin "*"
+Header add Access-Control-Allow-Headers "origin, x-requested-with, content-type"
+Header add Access-Control-Allow-Methods "PUT, GET, POST, DELETE, OPTIONS"
+
+
