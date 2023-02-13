@@ -235,14 +235,12 @@ public class OpenMap extends AppCompatActivity {
                                 map.invalidate();
                                 startMarker2.setOnMarkerClickListener((marker, mapView) -> {
                                     String Type = uneToilette.getType().equals("Privee") ? "Privée" : uneToilette.getType();
-
-                                    String distanceString = GetDistance(currentPos.getLatitude(), currentPos.getLongitude(), Double.parseDouble(uneToilette.getLatitude()), Double.parseDouble(uneToilette.getLongitude()));
-
+                                    String distanceString = "";
+                                    if(currentPos != null) {
+                                        distanceString = GetDistance(currentPos.getLatitude(), currentPos.getLongitude(), Double.parseDouble(uneToilette.getLatitude()), Double.parseDouble(uneToilette.getLongitude()));
+                                    }
                                     PopUpView.showPopupWindow(mapView, String.valueOf(uneToilette.getAdresse()), Type, uneToilette.getSwitch(),distanceString);
                                     map.getController().animateTo(marker.getPosition());
-
-
-
                                     return true;
                                 });
                             }
